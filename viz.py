@@ -1,6 +1,10 @@
 import serial
+import socket
+import threading
 from tkinter import *
 from tkinter import tkk
+
+
 
 
 #class representing the current state of the thumb
@@ -20,6 +24,16 @@ def convertData(rawdata: bytes):
     curl, left, right = chars.split(',')
     f1 = Finger(curl, left, right)
     return f1
+
+
+
+
+
+
+
+
+
+
 
 #replace these values with the actual Serial port name and baud rate
 PORT = 'PLACEHOLDER'
