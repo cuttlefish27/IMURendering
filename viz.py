@@ -1,11 +1,7 @@
 import serial
 import socket
 import threading
-from tkinter import *
-from tkinter import tkk
-
-
-
+from pynput import keyboard
 
 #class representing the current state of the thumb
 #curl represents the amount of curl in the finger(last two joints)
@@ -25,19 +21,19 @@ def convertData(rawdata: bytes):
     f1 = Finger(curl, left, right)
     return f1
 
+HOST = "127.0.0.1"
+PORT = 8765
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+client.connect((HOST, PORT))
+message = "1;2;3"
+client.send(message.encode())
+
+client.close()
 
 
 
-
-
-
-
-
-
-
-#replace these values with the actual Serial port name and baud rate
-PORT = 'PLACEHOLDER'
-BAUD = 0000
 
 
 # with serial.Serial(port=PORT, baudrate=BAUD, timeout = 1) as ser :
