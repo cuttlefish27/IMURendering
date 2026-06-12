@@ -1,48 +1,66 @@
 import serial
 import socket
 import threading
-from pynput import keyboard
+import queue
+import pygame
 
 #class representing the current state of the thumb
 #curl represents the amount of curl in the finger(last two joints)
 #left and right represent the servo angles in the palm
 
-
-class Finger():
-    def __init__(self, curl, left, right):
-        self.curl = curl
-        self.left = left
-        self.right = right
-        
-
-def convertData(rawdata: bytes):
-    chars = rawdata.decode('utf-8')
-    curl, left, right = chars.split(',')
-    f1 = Finger(curl, left, right)
-    return f1
-
+    
 HOST = "127.0.0.1"
 PORT = 8765
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+cmd_queue = queue.Queue()
 
-client.connect((HOST, PORT))
-message = "1;2;3"
-client.send(message.encode())
+def socket_thread() :
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind((HOST, PORT))
+    server.listen(1)
+    print("Server listening...")
 
-client.close()
+    conn, addr = server.accept()
+    print("Connected:", addr)
+
+    while True:
+        cmd = cmd_queue.get()
+        if cmd == "EXIT":
+            break
+        message = cmd.encode("utf-8")
+        conn.send(message)
+    conn.close()
+
+server_thread = threading.Thread(target=socket_thread, daemon=False)
+server_thread.start()
+
+
+pygame.init()
+pygame.display.set_mode((100, 100))  # hidden-ish input window
+
+running = True
+while running:
+    pygame.event.pump()
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_w:
+                cmd_queue.put("forward")
+            elif event.key == pygame.K_s:
+                cmd_queue.put("backward")
+            elif event.key == pygame.K_ESCAPE:
+                cmd_queue.put("EXIT")
+                running = False
+
+pygame.quit()
+ 
+server_thread.join()
 
 
 
 
 
-# with serial.Serial(port=PORT, baudrate=BAUD, timeout = 1) as ser :
-#     print(f"Connected to {ser.name}")
 
-#     while True:
-#         raw_data = ser.readLine()
-#         if raw_data:
-#             finger1 = convertData(raw_data)
+
 
 
 

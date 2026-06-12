@@ -4,47 +4,47 @@ import socket
 import threading
 import queue
 
+message_queue = queue.Queue()
+send_queue = queue.Queue()
 
 HOST = "127.0.0.1"
 PORT = 8765
 
-message_queue = queue.Queue()
+def client_process():
 
-
-def socket_thread() :
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((HOST, PORT))
-    server.listen(1)
-    print("Server listening...")
-
-    conn, addr = server.accept()
-    print("Connected:", addr)
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect((HOST, PORT))
+    
     while True:
-        data = conn.recv(1024)
+        data = client.recv(1024)
         if not data:
             break
 
         message = data.decode("utf-8")
         message_queue.put(message)
+        print(message)
+    client.close()
 
-    conn.close()
-
-def processes():
+def blender_processes():
     try:
         while True:
             message = message_queue.get_nowait()
             #replace with code that executes the blender object updates
+            print(message)
     except queue.Empty:
         pass
 
+    return 0.1
+
 #set daemon = True and remove .join() when running in a blender file
-server_thread = threading.Thread(target=socket_thread, daemon=False)
-server_thread.start()
 
-server_thread.join()
+#bpy.app.timer.register(processes)
+client_thread = threading.Thread(target=client_process, daemon=False)
+client_thread.start()
 
 
-
+blender_processes()
+client_thread.join()
 
 #loading blender data into variables for each digit of a finger
 # dBone = bpy.data.objects["distal"]
