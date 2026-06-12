@@ -1,4 +1,9 @@
-#CAN ONLY BE RUN IN A BLENDER INTERFACE
+##CAN ONLY BE RUN IN A BLENDER INTERFACE
+## All lines of code containing one # need to be uncommented
+## keep all lines that have two ##
+## comment out any lines that say comment out next to them
+## All comments are here to ensure that code for sockets and threading compiles inside of an external editor
+
 #import bpy
 import socket
 import threading
@@ -26,27 +31,30 @@ def client_process():
     client.close()
 
 def blender_processes():
+    #cube = bpy.data.objects["Cube"]
     try:
         while True:
             message = message_queue.get_nowait()
-            #replace with code that executes the blender object updates
+
+            if message == "forward":
+               #cube.location.x += 1
+               pass
+            elif message == "backward":
+                #cube.location.x -=1
+                pass
             print(message)
     except queue.Empty:
         pass
 
     return 0.1
 
-#set daemon = True and remove .join() when running in a blender file
+##set daemon = True and remove .join() when running in a blender file
 
-#bpy.app.timer.register(processes)
-client_thread = threading.Thread(target=client_process, daemon=False)
+#bpy.app.timer.register(blender_processes)
+client_thread = threading.Thread(target=client_process, daemon=True)
 client_thread.start()
 
 
-blender_processes()
-client_thread.join()
+blender_processes() #comment out
+client_thread.join() #comment out
 
-#loading blender data into variables for each digit of a finger
-# dBone = bpy.data.objects["distal"]
-# iBone = bpy.data.objects["intermediate"]
-# pBone = bpy.data.objects["phalanx"]
