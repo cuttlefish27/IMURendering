@@ -2,15 +2,30 @@
 #include <ESP32Servo.h>
 
 // put function declarations here:
-int myFunction(int, int);
+Servo myServo;
+
 
 void setup() {
   // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  Serial.begin(115200);
+  myServo.attach(27, 500, 2400);
+  myServo.write(0);
+  delay(10);
+  myServo.write(100);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  if(Serial.available()) {
+    String cmd = Serial.readStringUntil('\n');
+    cmd.trim();
+
+    if(cmd == "forward") {
+      myServo.write(myServo.read() + 10);
+    }
+    else if(cmd == "backward") {
+      myServo.write(myServo.read() - 10);
+    }
+  }
 }
 
 // put function definitions here:

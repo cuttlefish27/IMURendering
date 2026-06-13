@@ -12,34 +12,34 @@ def find_ports():
             return p.device
     return None
 
-#Host and port info for sockets connection
+##Host and port info for sockets connection
 HOST = "127.0.0.1"
 PORT = 8765
 
 
-# Port and Baud rate info for Serial connection
+## Port and Baud rate info for Serial connection
 
-# SERIAL_PORT = None 
-# if SERIAL_PORT == None:
-#     SERIAL_PORT = find_ports()
+SERIAL_PORT = None 
+if SERIAL_PORT == None:
+    SERIAL_PORT = find_ports()
 
-# if SERIAL_PORT == None:
-#     raise Exception("Serial Device not found")
+if SERIAL_PORT == None:
+    raise Exception("Serial Device not found")
 
-# BAUD = 115200
+BAUD = 115200
 
 
 cmd_queue = queue.Queue()
 serial_queue = queue.Queue()
 
-# def serial_process():
-#     ser = serial.Serial(SERIAL_PORT, BAUD, timeout=0)
-#     while True:
-#         cmd = serial_queue.get()
-#         if cmd == "EXIT":
-#             break
-#         ser.write((cmd + "\n").encode("utf-8"))
-#     ser.close()
+def serial_process():
+    ser = serial.Serial(SERIAL_PORT, BAUD, timeout=0)
+    while True:
+        cmd = serial_queue.get()
+        if cmd == "EXIT":
+            break
+        ser.write((cmd + "\n").encode("utf-8"))
+    ser.close()
 
 def socket_thread() :
     conn = None
@@ -61,6 +61,7 @@ def socket_thread() :
     if conn:
         while True:
             cmd = cmd_queue.get()
+            #print(cmd)
             if cmd == "EXIT":
                 break
             message = cmd.encode("utf-8")
@@ -70,9 +71,10 @@ def socket_thread() :
 
 
 
-# if SERIAL_PORT:
-#     serial_thread = threading.Thread(target=serial_process, daemon=False)
-#     serial_thread.start()
+if SERIAL_PORT:
+    print("starting serial process")
+    serial_thread = threading.Thread(target=serial_process, daemon=False)
+    serial_thread.start()
 
 server_thread = threading.Thread(target=socket_thread, daemon=False)
 server_thread.start()
@@ -102,6 +104,6 @@ while running:
 
 pygame.quit()
 
-# serial_thread.join()
+serial_thread.join()
 server_thread.join()
 
