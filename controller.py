@@ -50,7 +50,7 @@ def blender_processes():
 
 ##set daemon = True and remove .join() when running in a blender file
 
-#bpy.app.timer.register(blender_processes)
+#bpy.app.timers.register(blender_processes)
 client_thread = threading.Thread(target=client_process, daemon=True)
 client_thread.start()
 
